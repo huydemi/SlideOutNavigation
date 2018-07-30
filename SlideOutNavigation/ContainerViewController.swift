@@ -31,8 +31,16 @@ import QuartzCore
 
 class ContainerViewController: UIViewController {
   
+  enum SlideOutState {
+    case bothCollapsed
+    case leftPanelExpanded
+    case rightPanelExpanded
+  }
+  
   var centerNavigationController: UINavigationController!
   var centerViewController: CenterViewController!
+  var currentState: SlideOutState = .bothCollapsed
+  var leftViewController: SidePanelViewController?
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -72,12 +80,26 @@ private extension UIStoryboard {
 extension ContainerViewController: CenterViewControllerDelegate {
   
   func toggleLeftPanel() {
+    let notAlreadyExpanded = (currentState != .leftPanelExpanded)
+    
+    if notAlreadyExpanded {
+      addLeftPanelViewController()
+    }
+    
+    animateLeftPanel(shouldExpand: notAlreadyExpanded)
   }
   
   func toggleRightPanel() {
   }
   
   func addLeftPanelViewController() {
+    guard leftViewController == nil else { return }
+    
+    if let vc = UIStoryboard.leftViewController() {
+      vc.animals = Animal.allCats()
+      addChildSidePanelController(vc)
+      leftViewController = vc
+    }
   }
   
   func addRightPanelViewController() {
@@ -88,4 +110,14 @@ extension ContainerViewController: CenterViewControllerDelegate {
   
   func animateRightPanel(shouldExpand: Bool) {
   }
+  
+  // helper
+  func addChildSidePanelController(_ sidePanelController: SidePanelViewController) {
+    
+    view.insertSubview(sidePanelController.view, at: 0)
+    
+    addChildViewController(sidePanelController)
+    sidePanelController.didMove(toParentViewController: self)
+  }
+
 }
