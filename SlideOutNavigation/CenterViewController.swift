@@ -45,3 +45,14 @@ class CenterViewController: UIViewController {
     delegate?.toggleRightPanel?()
   }
 }
+
+extension CenterViewController: SidePanelViewControllerDelegate {
+  
+  func didSelectAnimal(_ animal: Animal) {
+    imageView.image = animal.image
+    titleLabel.text = animal.title
+    creatorLabel.text = animal.creator
+    
+    delegate?.collapseSidePanels?()
+  }
+}

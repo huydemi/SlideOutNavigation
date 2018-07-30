@@ -107,6 +107,18 @@ extension ContainerViewController: CenterViewControllerDelegate {
     animateRightPanel(shouldExpand: notAlreadyExpanded)
   }
   
+  func collapseSidePanels() {
+    
+    switch currentState {
+    case .rightPanelExpanded:
+      toggleRightPanel()
+    case .leftPanelExpanded:
+      toggleLeftPanel()
+    default:
+      break
+    }
+  }
+  
   // helpers
   
   func addLeftPanelViewController() {
@@ -163,7 +175,7 @@ extension ContainerViewController: CenterViewControllerDelegate {
   }
   
   func addChildSidePanelController(_ sidePanelController: SidePanelViewController) {
-    
+    sidePanelController.delegate = centerViewController
     view.insertSubview(sidePanelController.view, at: 0)
     
     addChildViewController(sidePanelController)
