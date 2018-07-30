@@ -31,8 +31,22 @@ import QuartzCore
 
 class ContainerViewController: UIViewController {
   
+  var centerNavigationController: UINavigationController!
+  var centerViewController: CenterViewController!
+  
   override func viewDidLoad() {
     super.viewDidLoad()
+    
+    centerViewController = UIStoryboard.centerViewController()
+    centerViewController.delegate = self
+    
+    // wrap the centerViewController in a navigation controller, so we can push views to it
+    // and display bar button items in the navigation bar
+    centerNavigationController = UINavigationController(rootViewController: centerViewController)
+    view.addSubview(centerNavigationController.view)
+    addChildViewController(centerNavigationController)
+    
+    centerNavigationController.didMove(toParentViewController: self)
   }
 }
 
@@ -50,5 +64,28 @@ private extension UIStoryboard {
   
   static func centerViewController() -> CenterViewController? {
     return mainStoryboard().instantiateViewController(withIdentifier: "CenterViewController") as? CenterViewController
+  }
+}
+
+// MARK: CenterViewController delegate
+
+extension ContainerViewController: CenterViewControllerDelegate {
+  
+  func toggleLeftPanel() {
+  }
+  
+  func toggleRightPanel() {
+  }
+  
+  func addLeftPanelViewController() {
+  }
+  
+  func addRightPanelViewController() {
+  }
+  
+  func animateLeftPanel(shouldExpand: Bool) {
+  }
+  
+  func animateRightPanel(shouldExpand: Bool) {
   }
 }
