@@ -39,8 +39,15 @@ class ContainerViewController: UIViewController {
   
   var centerNavigationController: UINavigationController!
   var centerViewController: CenterViewController!
-  var currentState: SlideOutState = .bothCollapsed
+  var currentState: SlideOutState = .bothCollapsed {
+    didSet {
+      let shouldShowShadow = currentState != .bothCollapsed
+      showShadowForCenterViewController(shouldShowShadow)
+    }
+  }
   var leftViewController: SidePanelViewController?
+  
+  let centerPanelExpandedOffset: CGFloat = 60
   
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -92,6 +99,8 @@ extension ContainerViewController: CenterViewControllerDelegate {
   func toggleRightPanel() {
   }
   
+  // helpers
+  
   func addLeftPanelViewController() {
     guard leftViewController == nil else { return }
     
@@ -106,12 +115,23 @@ extension ContainerViewController: CenterViewControllerDelegate {
   }
   
   func animateLeftPanel(shouldExpand: Bool) {
+    if shouldExpand {
+      currentState = .leftPanelExpanded
+      animateCenterPanelXPosition(
+        targetPosition: centerNavigationController.view.frame.width - centerPanelExpandedOffset)
+      
+    } else {
+      animateCenterPanelXPosition(targetPosition: 0) { finished in
+        self.currentState = .bothCollapsed
+        self.leftViewController?.view.removeFromSuperview()
+        self.leftViewController = nil
+      }
+    }
   }
   
   func animateRightPanel(shouldExpand: Bool) {
   }
   
-  // helper
   func addChildSidePanelController(_ sidePanelController: SidePanelViewController) {
     
     view.insertSubview(sidePanelController.view, at: 0)
@@ -120,4 +140,24 @@ extension ContainerViewController: CenterViewControllerDelegate {
     sidePanelController.didMove(toParentViewController: self)
   }
 
+  func animateCenterPanelXPosition(targetPosition: CGFloat, completion: ((Bool) -> Void)? = nil) {
+    
+    UIView.animate(withDuration: 0.5,
+                   delay: 0,
+                   usingSpringWithDamping: 0.8,
+                   initialSpringVelocity: 0,
+                   options: .curveEaseInOut, animations: {
+                    self.centerNavigationController.view.frame.origin.x = targetPosition
+    }, completion: completion)
+  }
+  
+  func showShadowForCenterViewController(_ shouldShowShadow: Bool) {
+    
+    if shouldShowShadow {
+      centerNavigationController.view.layer.shadowOpacity = 0.8
+    } else {
+      centerNavigationController.view.layer.shadowOpacity = 0.0
+    }
+  }
+  
 }
